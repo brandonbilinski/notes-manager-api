@@ -3,8 +3,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app import models, schemas
 from app.db import get_db
+from alembic import command
+from alembic.config import Config
 
 app = FastAPI()
+
+# def run_migrations():
+#     alembic_cfg = Config("alembic.ini")
+#     command.upgrade(alembic_cfg, "head")
+
+# @app.on_event("startup")
+# async def startup():
+#     run_migrations()
 
 @app.get("/")
 async def read_root():
