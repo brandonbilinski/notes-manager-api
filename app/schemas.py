@@ -9,9 +9,6 @@ class NoteCreate(BaseModel):
 class NoteCreateByID(NoteCreate):
      id:int
 
-class NoteGet(BaseModel):
-     id: int
-     title: str
-     content: str
-     embedding: list
-     created: str
+class NoteUpdateByID(BaseModel):
+     title: Optional[str] = None
+     content: Optional[str] = None

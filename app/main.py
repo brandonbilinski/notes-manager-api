@@ -16,10 +16,6 @@ app = FastAPI()
 # async def startup():
 #     run_migrations()
 
-@app.get("/")
-async def read_root():
-    return{"Hello":"World"}
-
 @app.post("/notes/")
 async def post_note(note: schemas.NoteCreate, db: AsyncSession = Depends(get_db)):
     new_note = models.Note(
@@ -53,6 +49,20 @@ async def get_note_by_id(id:int, db: AsyncSession = Depends(get_db)):
     note = await db.execute(select(models.Note).filter(models.Note.id == id))
     return note.scalars().all()
 
+@app.put("/notes/{id}")
+async def update_note_by_id(id: int, note:schemas.NoteUpdateByID, db: AsyncSession = Depends(get_db)):
+    note_old = await db.execute(select(models.Note).filter(models.Note.id == id))
+    note_old = note_old.scalar_one_or_none()
+
+    if note.content:
+        note_old.content = note.content
+    if note.title:
+        note_old.title = note.title
+    
+    await db.commit()
+    await db.refresh(note_old)
+    return note_old
+        
 @app.delete("/notes/all")
 async def delete_all_notes(db: AsyncSession = Depends(get_db)):
     stmt = delete(models.Note)
@@ -65,4 +75,4 @@ async def delete_by_id(id: int, db: AsyncSession = Depends(get_db)):
     stmt = delete(models.Note).where(models.Note.id == id)
     await db.execute(stmt)
     await db.commit()
-    return {"ok":True}
+    return
