@@ -6,6 +6,9 @@ class NoteCreate(BaseModel):
     title: str
     content: str
 
+class NoteCreateByID(NoteCreate):
+     id:int
+
 class NoteGet(BaseModel):
      id: int
      title: str
