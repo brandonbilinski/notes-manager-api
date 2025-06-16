@@ -1,20 +1,13 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, text, delete
+from sqlalchemy import select, delete
 from app import models, schemas
 from app.db import get_db
-from alembic import command
-from alembic.config import Config
+from sentence_transformers import SentenceTransformer
+import pickle
 
 app = FastAPI()
-
-# def run_migrations():
-#     alembic_cfg = Config("alembic.ini")
-#     command.upgrade(alembic_cfg, "head")
-
-# @app.on_event("startup")
-# async def startup():
-#     run_migrations()
+model = SentenceTransformer('all-MiniLM-L6-v2')
 
 @app.post("/notes/")
 async def post_note(note: schemas.NoteCreate, db: AsyncSession = Depends(get_db)):
@@ -22,10 +15,19 @@ async def post_note(note: schemas.NoteCreate, db: AsyncSession = Depends(get_db)
         title=note.title,
         content=note.content
     )
+
+    embed = model.encode(note.content).tolist()
+    
+    new_note.embedding = embed
+
     db.add(new_note)
     await db.commit()
     await db.refresh(new_note)
-    return new_note
+    return {
+        "id": new_note.id,
+        "title": new_note.title,
+        "content": new_note.content
+    }
 
 @app.post("/notes/{id}")
 async def post_note_by_id(note: schemas.NoteCreateByID, db: AsyncSession=Depends(get_db)):
@@ -34,20 +36,42 @@ async def post_note_by_id(note: schemas.NoteCreateByID, db: AsyncSession=Depends
         content=note.content,
         id=note.id
     )
+    embed = model.encode(note.content).tolist()
+    
+    new_note.embedding = embed
+
     db.add(new_note)
     await db.commit()
     await db.refresh(new_note)
-    return new_note
+    return {
+        "id": new_note.id,
+        "title": new_note.title,
+        "content": new_note.content
+    }
 
 @app.get("/notes/")
 async def get_all_notes(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(models.Note))
-    return result.scalars().all()
+    notes = result.scalars().all()
+    return [
+        {
+            "id": note.id,
+            "title": note.title,
+            "content": note.content
+            # omit embedding
+        }
+        for note in notes
+    ]
 
 @app.get("/notes/{id}")
 async def get_note_by_id(id:int, db: AsyncSession = Depends(get_db)):
     note = await db.execute(select(models.Note).filter(models.Note.id == id))
-    return note.scalars().all()
+    note = note.scalar_one_or_none()
+    return {
+        "id":note.id,
+        "title":note.title,
+        "content":note.content
+    }
 
 @app.put("/notes/{id}")
 async def update_note_by_id(id: int, note:schemas.NoteUpdateByID, db: AsyncSession = Depends(get_db)):
@@ -61,7 +85,11 @@ async def update_note_by_id(id: int, note:schemas.NoteUpdateByID, db: AsyncSessi
     
     await db.commit()
     await db.refresh(note_old)
-    return note_old
+    return {
+        "id":note_old.id,
+        "title":note_old.title,
+        "content":note_old.content
+    }
         
 @app.delete("/notes/all")
 async def delete_all_notes(db: AsyncSession = Depends(get_db)):
