@@ -1,10 +1,9 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, text
 from app import models, schemas
 from app.db import get_db
 from sentence_transformers import SentenceTransformer
-import pickle
 
 app = FastAPI()
 model = SentenceTransformer('all-MiniLM-L6-v2')
@@ -58,7 +57,6 @@ async def get_all_notes(db: AsyncSession = Depends(get_db)):
             "id": note.id,
             "title": note.title,
             "content": note.content
-            # omit embedding
         }
         for note in notes
     ]
@@ -72,6 +70,32 @@ async def get_note_by_id(id:int, db: AsyncSession = Depends(get_db)):
         "title":note.title,
         "content":note.content
     }
+
+@app.get("/search")
+async def get_by_search_query(q:str, db: AsyncSession = Depends(get_db)):
+    query_embed = model.encode(q).tolist()
+    query_embed = "[" + ",".join(map(str,query_embed)) + "]"
+    # query_embed = json.dumps(query_embed)
+    # return query_embed
+
+    query = text("""
+SELECT id, title, content,
+       1 - (embedding <#> CAST(:query_embed as vector)) AS similarity
+FROM notes
+ORDER BY embedding <#> CAST(:query_embed as vector)
+LIMIT 5;
+""")
+
+    similar = await db.execute(query, {"query_embed": query_embed})
+    rows = similar.fetchall()
+    return [
+        {
+            "id": note.id,
+            "title": note.title,
+            "content": note.content
+        }
+        for note in rows
+    ]
 
 @app.put("/notes/{id}")
 async def update_note_by_id(id: int, note:schemas.NoteUpdateByID, db: AsyncSession = Depends(get_db)):
