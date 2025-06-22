@@ -6,9 +6,11 @@ class NoteCreate(BaseModel):
     title: str
     content: str
 
+
 class NoteCreateByID(NoteCreate):
-     id:int
+    id: int
+
 
 class NoteUpdateByID(BaseModel):
-     title: Optional[str] = None
-     content: Optional[str] = None
+    title: Optional[str] = None
+    content: Optional[str] = None

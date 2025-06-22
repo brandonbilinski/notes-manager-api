@@ -4,4 +4,10 @@ A Personal Project exploring API creation, PostegreSQL Internals, and Semantic e
 ## Project Function
 This project was created to strengthen and familiarize myself with industry standard development tools. It serves as an entrypoint into a database using asynchronous methods, FastAPI, and alembic migrations. It has been dockerized as well to include the necessary Postgres extensions for semantic embedding.
 
+## Getting Started
+Hopefully I figure out if a makefile is good for this 
+
+## Available API Functions 
+Screenshot of SwaggerUI 
+
 ##### Created By Brandon Bilinski (https://github.com/brandonbilinski)

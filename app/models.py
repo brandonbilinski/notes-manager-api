@@ -3,6 +3,8 @@ from pgvector.sqlalchemy import Vector
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
+
+
 class Note(Base):
     __tablename__ = "notes"
 
