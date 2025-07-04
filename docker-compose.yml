@@ -16,5 +16,16 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+  api:
+    build: .
+    depends_on:
+      - db
+    ports:
+      - 8000:8000
+    environment:
+      DATABASE_URL: "postgresql+asyncpg://testuser:testpass@localhost:5432/notes_db"
+    volumes:
+      - .:/app
+    command: uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 volumes:
   pgdata:

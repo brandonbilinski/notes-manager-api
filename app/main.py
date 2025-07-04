@@ -19,7 +19,8 @@ You are able to:
 """
 
 tags_metadata = [
-    {"name": "Notes", "description": "Ways to interact with the notes themselves"}
+    {"name": "Notes", "description": "Ways to interact with the notes themselves"},
+    {"name":"Status", "description": "Handy call to see if the API service is running."}
 ]
 
 app = FastAPI(
@@ -34,7 +35,7 @@ app = FastAPI(
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 
-@app.get("/")
+@app.get("/", tags=["status"])
 async def root():
     return {"message": "Running"}
 
