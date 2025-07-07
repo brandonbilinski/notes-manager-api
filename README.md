@@ -9,6 +9,7 @@ This project was created to strengthen and familiarize myself with industry stan
 - Make
 - Docker Desktop
 - Python 3.9+
+- pip
 
 ### Makefile
 The system can be set up by simply running the makefile. To do this, navigate to the root directory of the project that contains the makefile and run
@@ -29,6 +30,16 @@ This will download the necessary images and start the database.
 
 You can check to make sure the container is running in docker desktop.
 
+Download all required packages
+```
+pip install -r requirements.txt
+```
+
+Run the alembic migrations with 
+```
+alembic upgrade head
+```
+
 To run the api in dev mode, activate the virtual environment and run 
 ```
 fastapi dev .\app\main.py
@@ -38,6 +49,7 @@ From there you should be able to interact with the api service and see its docum
 
 ## Available API Functions 
 
-Screenshot of SwaggerUI 
+![](ref\api-title.png)
+![](ref\api-functions.png)
 
 ##### Created By Brandon Bilinski (https://github.com/brandonbilinski)

@@ -35,7 +35,7 @@ app = FastAPI(
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 
-@app.get("/", tags=["status"])
+@app.get("/")
 async def root():
     return {"message": "Running"}
 
