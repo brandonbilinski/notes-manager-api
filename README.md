@@ -49,7 +49,7 @@ From there you should be able to interact with the api service and see its docum
 
 ## Available API Functions 
 
-![API Header](.\ref\api-title.png)
-![API available enpoints](.\ref\api-functions.png)
+![API Header](./ref/api-title.png)
+![API available enpoints](./ref/api-functions.png)
 
 ##### Created By Brandon Bilinski (https://github.com/brandonbilinski)
